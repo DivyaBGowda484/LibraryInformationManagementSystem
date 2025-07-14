@@ -70,6 +70,13 @@ A comprehensive web-based Library Information Management System built with Djang
 
 ---
 
+## 🎥 Demo
+
+[![Watch the demo](https://img.youtube.com/vi/YOUR_VIDEO_ID/0.jpg)]
+*Click the image above to watch a full demo of the system in action!*
+
+---
+
 ## 🏗️ Project Structure
 
 ```bash
