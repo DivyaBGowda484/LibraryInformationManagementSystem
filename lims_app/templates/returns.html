@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+{% extends "index.html" %}
+{% load static %}
+
+{% block main_content %}
+<div class="container-flex text-center justify-content-center align-items-center" style="padding-top:10px; padding-bottom: 20px; margin-top:10px; vertical-align:middle;">
+    
+    <!-- Messages Display -->
+    {% if messages %}
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="row justify-content-center align middle" style="margin-top:10px; height:60px;">
+        <div class="col-md-12 text-light" style="background-color:#4B088A;">
+            <h4 style="margin-top:15px">Returns - Process Book Returns</h4>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-12">
+            <div class="container" style="overflow-y:auto; height:600px; background:#F5F5F5">
+                
+                <!-- Reader Filter -->
+                <div class="row" style="margin-top:20px;">
+                    <div class="col-md-6">
+                        <form method="POST" class="d-flex">
+                            {% csrf_token %}
+                            <select class="form-select me-2" name="reader_id" onchange="this.form.submit()">
+                                <option value="">All Readers</option>
+                                {% for reader in readers %}
+                                    <option value="{{ reader.id }}" {% if reader.id|stringformat:"s" == selected_reader %}selected{% endif %}>
+                                        {{ reader.reader_name }} ({{ reader.reference_id }})
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </form>
+                    </div>
+                    <div class="col-md-6">
+                        <p class="text-muted">Books pending return: {{ borrowed_books|length }}</p>
+                    </div>
+                </div>
+                
+                <!-- Borrowed Books Table -->
+                <div class="row" style="margin-top:20px;">
+                    <div class="col-md-12">
+                        {% if borrowed_books %}
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Reader</th>
+                                    <th>Book Title</th>
+                                    <th>Author</th>
+                                    <th>Borrowed Date</th>
+                                    <th>Due Date</th>
+                                    <th>Status</th>
+                                    <th>Days Overdue</th>
+                                    <th>Action</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for borrowed_book in borrowed_books %}
+                                <tr {% if borrowed_book.is_overdue %}class="table-danger"{% endif %}>
+                                    <td>
+                                        <strong>{{ borrowed_book.reader.reader_name }}</strong><br>
+                                        <small class="text-muted">{{ borrowed_book.reader.reference_id }}</small><br>
+                                        <small class="text-muted">{{ borrowed_book.reader.reader_contact }}</small>
+                                    </td>
+                                    <td>
+                                        <strong>{{ borrowed_book.book.title }}</strong><br>
+                                        <small class="text-muted">ISBN: {{ borrowed_book.book.isbn }}</small>
+                                    </td>
+                                    <td>{{ borrowed_book.book.author }}</td>
+                                    <td>{{ borrowed_book.borrow_date|date:"M d, Y" }}</td>
+                                    <td>{{ borrowed_book.due_date|date:"M d, Y" }}</td>
+                                    <td>
+                                        {% if borrowed_book.is_overdue %}
+                                            <span class="badge bg-danger">Overdue</span>
+                                        {% else %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if borrowed_book.is_overdue %}
+                                            <span class="text-danger fw-bold">{{ borrowed_book.days_overdue }} days</span>
+                                        {% else %}
+                                            <span class="text-success">On time</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <button class="btn btn-sm btn-warning" data-bs-toggle="modal" data-bs-target="#returnModal{{ borrowed_book.id }}">
+                                            Return Book
+                                        </button>
+                                    </td>
+                                </tr>
+                                
+                                <!-- Return Modal -->
+                                <div class="modal fade" id="returnModal{{ borrowed_book.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Return Book</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <div class="modal-body">
+                                                <div class="row">
+                                                    <div class="col-md-6">
+                                                        <p><strong>Reader:</strong> {{ borrowed_book.reader.reader_name }}</p>
+                                                        <p><strong>Book:</strong> {{ borrowed_book.book.title }}</p>
+                                                        <p><strong>Author:</strong> {{ borrowed_book.book.author }}</p>
+                                                        <p><strong>Borrowed:</strong> {{ borrowed_book.borrow_date|date:"M d, Y" }}</p>
+                                                        <p><strong>Due:</strong> {{ borrowed_book.due_date|date:"M d, Y" }}</p>
+                                                    </div>
+                                                    <div class="col-md-6">
+                                                        {% if borrowed_book.is_overdue %}
+                                                            <div class="alert alert-danger">
+                                                                <strong>Overdue!</strong><br>
+                                                                This book is {{ borrowed_book.days_overdue }} days overdue.
+                                                            </div>
+                                                        {% else %}
+                                                            <div class="alert alert-success">
+                                                                <strong>On Time</strong><br>
+                                                                This book is being returned on time.
+                                                            </div>
+                                                        {% endif %}
+                                                    </div>
+                                                </div>
+                                                <p class="text-muted">Are you sure you want to process this return?</p>
+                                            </div>
+                                            <div class="modal-footer">
+                                                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                <a href="/return_book/{{ borrowed_book.id }}" class="btn btn-warning">Process Return</a>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                        {% else %}
+                        <div class="text-center" style="margin-top:50px;">
+                            <div class="alert alert-info">
+                                <h5>No books pending return</h5>
+                                <p>{% if selected_reader %}The selected reader has no books to return.{% else %}All books have been returned.{% endif %}</p>
+                                <a href="/books" class="btn btn-primary">Browse Books</a>
+                            </div>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+                
+                <!-- Return Statistics -->
+                {% if borrowed_books %}
+                <div class="row" style="margin-top:30px;">
+                    <div class="col-md-12">
+                        <div class="card">
+                            <div class="card-body">
+                                <h5 class="card-title">Return Statistics</h5>
+                                <div class="row">
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <h6>Total Pending</h6>
+                                            <span class="badge bg-primary">{{ borrowed_books|length }}</span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <h6>Overdue</h6>
+                                            <span class="badge bg-danger">
+                                                {% for book in borrowed_books %}
+                                                    {% if book.is_overdue %}1{% endif %}
+                                                {% empty %}0{% endfor %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <h6>Due Today</h6>
+                                            <span class="badge bg-warning">
+                                                {% for book in borrowed_books %}
+                                                    {% if not book.is_overdue %}
+                                                        {% with days_remaining=book.due_date|timeuntil %}
+                                                            {% if "0 minutes" in days_remaining or "today" in days_remaining %}1{% endif %}
+                                                        {% endwith %}
+                                                    {% endif %}
+                                                {% empty %}0{% endfor %}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="col-md-3">
+                                        <div class="text-center">
+                                            <h6>Readers</h6>
+                                            <span class="badge bg-success">
+                                                {% regroup borrowed_books by reader as reader_list %}
+                                                {{ reader_list|length }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 

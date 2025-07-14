@@ -1,19 +1,62 @@
-# Django
-*.pyc
+# Python
 __pycache__/
-db.sqlite3
-*.log
-*.pot
 *.py[cod]
-*.swp
-media/
-.env
-*.sqlite3
-*.migrations/
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+share/python-wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+MANIFEST
 
-# VSCode or IDE
+# Django
+*.log
+local_settings.py
+db.sqlite3
+db.sqlite3-journal
+media/
+
+# Environment variables
+.env
+.venv
+env/
+venv/
+ENV/
+env.bak/
+venv.bak/
+
+# IDE
 .vscode/
 .idea/
+*.swp
+*.swo
+*~
 
-# MacOS
+# OS
 .DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+
+# Migrations (optional - comment out if you want to include migrations)
+# */migrations/00*.py
+
+# Static files (if collected)
+staticfiles/
+static_root/

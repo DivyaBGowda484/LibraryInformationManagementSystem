@@ -41,6 +41,13 @@
                     {% endif %}
                 </li>
                 <li class="nav-item">
+                    {% if current_tab == 'books' %}
+                        <a class="nav-link active" href="/books">BOOKS</a>
+                    {% else %}
+                        <a class="nav-link" href="/books">BOOKS</a>
+                    {% endif %}
+                </li>
+                <li class="nav-item">
                     {% if current_tab == 'my_bag' %}
                         <a class="nav-link active" href="/my_bag">MY BAG</a>
                     {% else %}

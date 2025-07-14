@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+{% extends "index.html" %}
+{% load static %}
+
+{% block main_content %}
+<div class="container-flex text-center justify-content-center align-items-center" style="padding-top:10px; padding-bottom: 20px; margin-top:10px; vertical-align:middle;">
+    
+    <!-- Messages Display -->
+    {% if messages %}
+        <div class="row justify-content-center">
+            <div class="col-md-10">
+                {% for message in messages %}
+                    <div class="alert alert-{{ message.tags }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    {% endif %}
+    
+    <div class="row justify-content-center align middle" style="margin-top:10px; height:60px;">
+        <div class="col-md-4 text-light" style="background-color:#4B088A;">
+            <h4 style="margin-top:15px">Add new book</h4>
+        </div>
+        <div class="col-md-8">
+            <h4>Search books</h4>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-md-4">
+            <div class="container" style="overflow-y:auto; height:600px; background:#CEECF5">
+                <form class="d-flex" action="/books/add" method="POST">
+                    {% csrf_token %}
+                    <table class="table" style="margin-top:20px;">
+                        <tr>
+                            <td style="text-align: left; vertical-align:middle; padding-left:15px;">ISBN : </td>
+                            <td><input type="text" class="form-control" name="isbn" required></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; vertical-align:middle; padding-left:15px;">Title : </td>
+                            <td><input type="text" class="form-control" name="title" required></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; vertical-align:middle; padding-left:15px;">Author : </td>
+                            <td><input type="text" class="form-control" name="author" required></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; vertical-align:middle; padding-left:15px;">Genre : </td>
+                            <td><input type="text" class="form-control" name="genre" required></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; vertical-align:middle; padding-left:15px;">Publication Year : </td>
+                            <td><input type="number" class="form-control" name="publication_year" required></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; vertical-align:middle; padding-left:15px;">Total Copies : </td>
+                            <td><input type="number" class="form-control" name="total_copies" min="1" required></td>
+                        </tr>
+                        <tr>
+                            <td style="text-align: left; vertical-align:middle; padding-left:15px;">Description : </td>
+                            <td><textarea class="form-control" name="description" rows="3"></textarea></td>
+                        </tr>
+                        <tr>
+                            <td colspan="2" style="text-align: center; padding-top:20px;">
+                                <button type="submit" class="btn btn-success">Add Book</button>
+                            </td>
+                        </tr>
+                    </table>
+                </form>
+            </div>
+        </div>
+        
+        <div class="col-md-8">
+            <div class="container" style="overflow-y:auto; height:600px; background:#F5F5F5">
+                <div class="row" style="margin-top:20px;">
+                    <div class="col-md-8">
+                        <form method="POST" class="d-flex">
+                            {% csrf_token %}
+                            <input class="form-control me-2" type="search" name="query" placeholder="Search books..." value="{{ query }}">
+                            <button class="btn btn-outline-success" type="submit">Search</button>
+                        </form>
+                    </div>
+                    <div class="col-md-4">
+                        <p class="text-muted">Total books: {{ books|length }}</p>
+                    </div>
+                </div>
+                
+                <div class="row" style="margin-top:20px;">
+                    <div class="col-md-12">
+                        <table class="table table-striped">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Author</th>
+                                    <th>Genre</th>
+                                    <th>Year</th>
+                                    <th>Available</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for book in books %}
+                                <tr>
+                                    <td><strong>{{ book.title }}</strong></td>
+                                    <td>{{ book.author }}</td>
+                                    <td>{{ book.genre }}</td>
+                                    <td>{{ book.publication_year }}</td>
+                                    <td>
+                                        {% if book.is_available %}
+                                            <span class="badge bg-success">{{ book.available_copies }}/{{ book.total_copies }}</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Not Available</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        {% if book.is_available %}
+                                            <button class="btn btn-sm btn-primary" data-bs-toggle="modal" data-bs-target="#borrowModal{{ book.id }}">
+                                                Borrow
+                                            </button>
+                                        {% else %}
+                                            <button class="btn btn-sm btn-secondary" disabled>
+                                                Unavailable
+                                            </button>
+                                        {% endif %}
+                                    </td>
+                                </tr>
+                                
+                                <!-- Borrow Modal -->
+                                <div class="modal fade" id="borrowModal{{ book.id }}" tabindex="-1">
+                                    <div class="modal-dialog">
+                                        <div class="modal-content">
+                                            <div class="modal-header">
+                                                <h5 class="modal-title">Borrow Book</h5>
+                                                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                                            </div>
+                                            <form method="POST" action="/borrow_book">
+                                                {% csrf_token %}
+                                                <div class="modal-body">
+                                                    <p><strong>Book:</strong> {{ book.title }}</p>
+                                                    <p><strong>Author:</strong> {{ book.author }}</p>
+                                                    <div class="mb-3">
+                                                        <label for="reader_id" class="form-label">Select Reader:</label>
+                                                        <select class="form-select" name="reader_id" required>
+                                                            <option value="">Choose a reader...</option>
+                                                            {% for reader in readers %}
+                                                            <option value="{{ reader.id }}">{{ reader.reader_name }} ({{ reader.reference_id }})</option>
+                                                            {% endfor %}
+                                                        </select>
+                                                    </div>
+                                                    <input type="hidden" name="book_id" value="{{ book.id }}">
+                                                </div>
+                                                <div class="modal-footer">
+                                                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                                                    <button type="submit" class="btn btn-primary">Borrow Book</button>
+                                                </div>
+                                            </form>
+                                        </div>
+                                    </div>
+                                </div>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
