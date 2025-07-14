@@ -264,17 +264,6 @@ This project is open source and available under the [MIT License](LICENSE).
 
 **Divya B Gowda**
 - GitHub: [@DivyaBGowda484](https://github.com/DivyaBGowda484)
-- LinkedIn: [Connect with me](https://linkedin.com/in/divyabgowda484)
+- LinkedIn: [Connect with me](https://www.linkedin.com/in/divya2004/)
 
 ---
-
-## 🙏 Acknowledgments
-
-- Django framework for the robust backend
-- Bootstrap for the responsive UI components
-- SQLite for the reliable database solution
-- The open-source community for inspiration and support
-
----
-
-*Built with ❤️ using Django and Bootstrap*
