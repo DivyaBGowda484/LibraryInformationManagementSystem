@@ -121,7 +121,7 @@ STATIC_URL = "static/"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
-ALLOWED_HOSTS = ['your-render-subdomain.onrender.com']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')
 
