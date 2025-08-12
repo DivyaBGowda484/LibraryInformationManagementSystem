@@ -216,27 +216,6 @@ python manage.py runserver
 
 ---
 
-## 🎨 Screenshots
-
-### Main Navigation
-The application features a clean, responsive navigation bar with easy access to all major sections.
-
-### Book Catalog
-Browse available books with real-time availability status and borrowing functionality.
-
-### My Bag
-Track all borrowed books with overdue indicators and return status.
-
-### Returns Processing
-Efficient returns processing with confirmation dialogs and automatic inventory updates.
-
-### Admin Interface
-Enhanced Django admin with custom forms and bulk operations.
-
-*Screenshots will be added here*
-
----
-
 ## 🚧 Future Enhancements
 
 - [ ] Email notifications for overdue books
@@ -260,19 +239,3 @@ Contributions are welcome! Please feel free to submit a Pull Request. For major 
 3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
----
-
-## 📄 License
-
-This project is open source and available under the [MIT License](LICENSE).
-
----
-
-## 👩‍💻 Author
-
-**Divya B Gowda**
-- GitHub: [@DivyaBGowda484](https://github.com/DivyaBGowda484)
-- LinkedIn: [Connect with me](https://www.linkedin.com/in/divya2004/)
-
----
